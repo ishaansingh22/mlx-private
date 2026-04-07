@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.DS_Store
+.pytest_cache/
+
+# Internal planning / exploration
+north-star.md
+docs/
+phase0/
+
+# Generated experiment artifacts (scripts are committed, outputs are not)
+experiments/mia/mia_run/

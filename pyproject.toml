@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mlx-private"
+version = "0.1.0"
+description = "MLX-native DP-SGD for private LoRA fine-tuning on Apple Silicon"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = [
+    "mlx>=0.31.0",
+]
+
+[project.urls]
+Repository = "https://github.com/IshaanSingh22/mlx-private"
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "dp-accounting>=0.4",
+    "numpy",
+]
+lora = [
+    "mlx-lm",
+    "numpy",
+]
+dev = [
+    "mlx-private[test,lora]",
+]
+
+[tool.setuptools.packages.find]
+include = ["mlx_private*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "mnist: requires MNIST data files in /tmp/mnist",
+    "lora: requires mlx-lm and downloads model weights",
+]
