@@ -36,8 +36,20 @@ Without DP, the attacker identifies training examples at AUC 0.79. With DP, the 
 
 Canary ablation confirms the attack detects genuine memorization, not template recognition: unseen canaries (novel codes, same template) have loss 0.857 ± 0.075, clustering with nonmembers (0.786) not members (0.696).
 
-Reproduce: `cd experiments/mia && python run_experiment.py --epochs 5 --seed 42`
-Multi-seed: `python multi_seed.py --seeds 5`
+### Real-Data Validation (PubMedQA)
+
+To confirm leakage isn't an artifact of planted canaries, we repeated the MIA on PubMedQA — 500 real medical QA examples. The LoRA fine-tune does not learn the classification task at this scale (accuracy ≈ majority baseline), yet the model still leaks training-text membership:
+
+| Setting | ε (measured) | MIA AUC | Member Loss | Nonmember Loss |
+|---|---|---|---|---|
+| No DP | ∞ | **0.75–0.80** | 0.18 | 0.39 |
+| DP (σ=0.5) | 8.80 | 0.50–0.53 | 0.79 | 0.92 |
+| DP (σ=1.5) | 0.47 | 0.50–0.53 | 1.19 | 1.30 |
+
+Non-DP AUC range is across 2 seeds. DP collapses the attack to chance on real text just as on canaries. The key finding: **leakage and utility are decoupled** — a fine-tune that fails to generalize still leaks training membership at AUC 0.80, and DP closes that leak.
+
+Reproduce: `python3 examples/canary_frontier.py` (canary) or `python3 examples/pubmedqa_dp.py` (PubMedQA).
+Multi-seed canary: `cd experiments/mia && python multi_seed.py --seeds 5`
 
 ## Install
 

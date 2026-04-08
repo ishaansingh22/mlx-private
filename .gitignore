@@ -13,3 +13,4 @@ phase0/
 
 # Generated experiment artifacts (scripts are committed, outputs are not)
 experiments/mia/mia_run/
+examples/.cache/
