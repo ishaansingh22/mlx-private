@@ -96,11 +96,7 @@ def build_model(model_name=DEFAULT_MODEL, patch_attention=False):
 
 def per_sample_loss(model, x, y):
     logits = model(x[None, :])
-    return nn.losses.cross_entropy(
-        logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-        y[None, 1:].reshape(-1),
-        reduction="mean",
-    )
+    return nn.losses.cross_entropy(logits[0], y, reduction="mean")
 
 
 # ---- training ------------------------------------------------------------
@@ -129,8 +125,8 @@ def train_adapter(setting_name, train_x, train_y, *, seed=SEED, epochs=EPOCHS, m
         def batch_loss(model, x, y):
             logits = model(x)
             return nn.losses.cross_entropy(
-                logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-                y[:, 1:].reshape(-1), reduction="mean",
+                logits.reshape(-1, logits.shape[-1]),
+                y.reshape(-1), reduction="mean",
             )
         loss_and_grad = nn.value_and_grad(model, batch_loss)
         optimizer = Adam(learning_rate=LR)
@@ -150,16 +146,16 @@ def train_adapter(setting_name, train_x, train_y, *, seed=SEED, epochs=EPOCHS, m
             yb = train_y[mx.array(idx)]
 
             if is_dp:
+                logits = model(xb)
+                loss = nn.losses.cross_entropy(
+                    logits.reshape(-1, logits.shape[-1]),
+                    yb.reshape(-1), reduction="mean",
+                )
+                mx.eval(loss)
                 grads = ps_fn(xb, yb)
                 mx.eval(grads)
                 optimizer.step(model, grads)
                 mx.eval(model.parameters())
-                logits = model(xb)
-                loss = nn.losses.cross_entropy(
-                    logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-                    yb[:, 1:].reshape(-1), reduction="mean",
-                )
-                mx.eval(loss)
             else:
                 loss, grads = loss_and_grad(model, xb, yb)
                 optimizer.update(model, grads)
@@ -196,11 +192,7 @@ def score_losses(model, all_x, all_y):
     losses = []
     for i in range(all_x.shape[0]):
         logits = model(all_x[i : i + 1])
-        loss = nn.losses.cross_entropy(
-            logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-            all_y[i : i + 1, 1:].reshape(-1),
-            reduction="mean",
-        )
+        loss = nn.losses.cross_entropy(logits[0], all_y[i], reduction="mean")
         mx.eval(loss)
         losses.append(float(loss.item()))
     return losses

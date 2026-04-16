@@ -65,11 +65,7 @@ def tokenize_corpus(tokenizer, texts: list[str], seq_len: int = 64):
 
 def per_sample_loss(model, x, y):
     logits = model(x[None, :])
-    return nn.losses.cross_entropy(
-        logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-        y[None, 1:].reshape(-1),
-        reduction="mean",
-    )
+    return nn.losses.cross_entropy(logits[0], y, reduction="mean")
 
 
 def generate(model, tokenizer, prompt: str, max_tokens: int = 100, temp: float = 0.7):
@@ -149,9 +145,8 @@ def main():
 
             logits = model(xb)
             loss = nn.losses.cross_entropy(
-                logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-                yb[:, 1:].reshape(-1),
-                reduction="mean",
+                logits.reshape(-1, logits.shape[-1]),
+                yb.reshape(-1), reduction="mean",
             )
             mx.eval(loss)
             epoch_losses.append(float(loss.item()))

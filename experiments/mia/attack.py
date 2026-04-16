@@ -70,10 +70,10 @@ def score_losses(
         xi = all_x[i : i + 1]
         yi = all_y[i : i + 1]
         logits = model(xi)
-        pred = logits[:, :-1, :]
-        target = yi[:, 1:]
+        pred = logits
+        target = yi
         if response_start is not None and response_start > 0:
-            start = max(0, response_start - 1)  # shift for next-token offset
+            start = max(0, response_start - 1)
             pred = pred[:, start:, :]
             target = target[:, start:]
         loss = nn.losses.cross_entropy(

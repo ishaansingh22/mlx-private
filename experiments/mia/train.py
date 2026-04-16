@@ -84,11 +84,7 @@ def tokenize_corpus(tokenizer, corpus: list[str], seq_len: int):
 
 def per_sample_loss(model, x, y):
     logits = model(x[None, :])
-    return nn.losses.cross_entropy(
-        logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-        y[None, 1:].reshape(-1),
-        reduction="mean",
-    )
+    return nn.losses.cross_entropy(logits[0], y, reduction="mean")
 
 
 def train(cfg: dict, train_x, train_y, output_dir: str):
@@ -119,9 +115,8 @@ def train(cfg: dict, train_x, train_y, output_dir: str):
         def batch_loss(model, x, y):
             logits = model(x)
             return nn.losses.cross_entropy(
-                logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-                y[:, 1:].reshape(-1),
-                reduction="mean",
+                logits.reshape(-1, logits.shape[-1]),
+                y.reshape(-1), reduction="mean",
             )
         loss_and_grad = nn.value_and_grad(model, batch_loss)
         optimizer = Adam(learning_rate=cfg["lr"])
@@ -141,17 +136,16 @@ def train(cfg: dict, train_x, train_y, output_dir: str):
             yb = train_y[mx.array(idx)]
 
             if is_dp:
+                logits = model(xb)
+                loss = nn.losses.cross_entropy(
+                    logits.reshape(-1, logits.shape[-1]),
+                    yb.reshape(-1), reduction="mean",
+                )
+                mx.eval(loss)
                 grads = ps_fn(xb, yb)
                 mx.eval(grads)
                 optimizer.step(model, grads)
                 mx.eval(model.parameters())
-                logits = model(xb)
-                loss = nn.losses.cross_entropy(
-                    logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-                    yb[:, 1:].reshape(-1),
-                    reduction="mean",
-                )
-                mx.eval(loss)
             else:
                 loss, grads = loss_and_grad(model, xb, yb)
                 optimizer.update(model, grads)

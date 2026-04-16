@@ -35,11 +35,7 @@ def _load_lora_model():
 
 def _lm_loss(model, x, y):
     logits = model(x[None, :])
-    return nn.losses.cross_entropy(
-        logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-        y[None, 1:].reshape(-1),
-        reduction="mean",
-    )
+    return nn.losses.cross_entropy(logits[0], y, reduction="mean")
 
 
 def test_lora_dp_sgd():
@@ -86,9 +82,8 @@ def test_lora_dp_sgd():
         if step % 10 == 0:
             logits = model(xb)
             loss = nn.losses.cross_entropy(
-                logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-                yb[:, 1:].reshape(-1),
-                reduction="mean",
+                logits.reshape(-1, logits.shape[-1]),
+                yb.reshape(-1), reduction="mean",
             )
             mx.eval(loss)
             losses.append(loss.item())
@@ -98,9 +93,8 @@ def test_lora_dp_sgd():
 
     logits = model(data_x[:B])
     final_loss = nn.losses.cross_entropy(
-        logits[:, :-1, :].reshape(-1, logits.shape[-1]),
-        data_y[:B, 1:].reshape(-1),
-        reduction="mean",
+        logits.reshape(-1, logits.shape[-1]),
+        data_y[:B].reshape(-1), reduction="mean",
     )
     mx.eval(final_loss)
     losses.append(final_loss.item())

@@ -151,9 +151,9 @@ def build_model(patch_attention=False):
     return model, tokenizer
 
 
-def _masked_loss(per_tok, mask_shifted):
-    numer = (per_tok * mask_shifted).sum()
-    denom = mx.maximum(mask_shifted.sum(), mx.array(1.0))
+def _masked_loss(per_tok, mask):
+    numer = (per_tok * mask).sum()
+    denom = mx.maximum(mask.sum(), mx.array(1.0))
     return numer / denom
 
 
@@ -162,10 +162,8 @@ def per_sample_loss(model, x, y):
     targets = y[0]
     mask = y[1].astype(mx.float32)
     logits = model(x[None, :])
-    per_tok = nn.losses.cross_entropy(
-        logits[0, :-1, :], targets[1:], reduction="none",
-    )
-    return _masked_loss(per_tok, mask[1:])
+    per_tok = nn.losses.cross_entropy(logits[0], targets, reduction="none")
+    return _masked_loss(per_tok, mask)
 
 
 # ---- training ------------------------------------------------------------
@@ -195,10 +193,8 @@ def train_setting(setting_name, train_x, train_y, *, seed=SEED, epochs=EPOCHS):
             targets = y[:, 0, :]
             mask = y[:, 1, :].astype(mx.float32)
             logits = model(x)
-            per_tok = nn.losses.cross_entropy(
-                logits[:, :-1, :], targets[:, 1:], reduction="none",
-            )
-            return _masked_loss(per_tok, mask[:, 1:])
+            per_tok = nn.losses.cross_entropy(logits, targets, reduction="none")
+            return _masked_loss(per_tok, mask)
 
         loss_and_grad = nn.value_and_grad(model, batch_loss)
         optimizer = Adam(learning_rate=LR)
@@ -218,18 +214,16 @@ def train_setting(setting_name, train_x, train_y, *, seed=SEED, epochs=EPOCHS):
             yb = train_y[mx.array(idx)]
 
             if is_dp:
+                targets = yb[:, 0, :]
+                mask = yb[:, 1, :].astype(mx.float32)
+                logits = model(xb)
+                per_tok = nn.losses.cross_entropy(logits, targets, reduction="none")
+                loss = _masked_loss(per_tok, mask)
+                mx.eval(loss)
                 grads = ps_fn(xb, yb)
                 mx.eval(grads)
                 optimizer.step(model, grads)
                 mx.eval(model.parameters())
-                targets = yb[:, 0, :]
-                mask = yb[:, 1, :].astype(mx.float32)
-                logits = model(xb)
-                per_tok = nn.losses.cross_entropy(
-                    logits[:, :-1, :], targets[:, 1:], reduction="none",
-                )
-                loss = _masked_loss(per_tok, mask[:, 1:])
-                mx.eval(loss)
             else:
                 loss, grads = loss_and_grad(model, xb, yb)
                 optimizer.update(model, grads)
@@ -268,10 +262,8 @@ def score_losses(model, all_x, all_y):
         targets = all_y[i, 0, :]
         mask = all_y[i, 1, :].astype(mx.float32)
         logits = model(all_x[i : i + 1])
-        per_tok = nn.losses.cross_entropy(
-            logits[0, :-1, :], targets[1:], reduction="none",
-        )
-        loss = _masked_loss(per_tok, mask[1:])
+        per_tok = nn.losses.cross_entropy(logits[0], targets, reduction="none")
+        loss = _masked_loss(per_tok, mask)
         mx.eval(loss)
         losses.append(float(loss.item()))
     return losses
