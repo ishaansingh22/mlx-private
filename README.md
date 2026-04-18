@@ -1,4 +1,4 @@
-# mlx-private
+# private-mlx
 
 Per-sample differentially private SGD (DP-SGD) for LoRA fine-tuning on Apple Silicon. All training runs on-device via MLX.
 
