@@ -17,7 +17,7 @@ import mlx.nn as nn
 from mlx.utils import tree_flatten
 from mlx.optimizers import SGD, Adam
 
-from mlx_private import make_private_loss, DPOptimizer
+from private_mlx import make_private_loss, DPOptimizer
 
 pytestmark = pytest.mark.mnist
 

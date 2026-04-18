@@ -1,4 +1,4 @@
-"""Tests for mlx_private.clip."""
+"""Tests for private_mlx.clip."""
 
 import math
 import pytest
@@ -6,7 +6,7 @@ import mlx.core as mx
 import mlx.nn as nn
 from mlx.utils import tree_flatten
 
-from mlx_private import (
+from private_mlx import (
     make_private_loss,
     per_sample_global_norm,
     clip_and_aggregate,

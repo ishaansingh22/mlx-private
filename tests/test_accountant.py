@@ -1,4 +1,4 @@
-"""Tests for mlx_private.accountant.
+"""Tests for private_mlx.accountant.
 
 Cross-validates against Google's dp-accounting library (test-only dependency).
 """
@@ -7,7 +7,7 @@ import math
 import itertools
 import pytest
 
-from mlx_private.accountant import (
+from private_mlx.accountant import (
     RDPAccountant,
     compute_rdp_poisson_subsampled_gaussian,
     rdp_to_epsilon,

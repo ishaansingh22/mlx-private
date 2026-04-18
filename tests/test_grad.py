@@ -1,11 +1,11 @@
-"""Tests for mlx_private.grad and mlx_private._check."""
+"""Tests for private_mlx.grad and private_mlx._check."""
 
 import pytest
 import mlx.core as mx
 import mlx.nn as nn
 from mlx.utils import tree_flatten
 
-from mlx_private import make_private_loss, check_model, UnsupportedModuleError
+from private_mlx import make_private_loss, check_model, UnsupportedModuleError
 
 
 class MLP(nn.Module):

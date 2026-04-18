@@ -19,8 +19,8 @@ import numpy as np
 from mlx.optimizers import Adam
 from mlx.utils import tree_flatten
 
-from mlx_private import DPOptimizer, make_private_loss
-from mlx_private._patch import ensure_attention_backend_for_per_sample_grads
+from private_mlx import DPOptimizer, make_private_loss
+from private_mlx._patch import ensure_attention_backend_for_per_sample_grads
 
 SETTINGS = {
     "non_dp": {"noise_multiplier": 0.0, "l2_norm_clip": 1e10},

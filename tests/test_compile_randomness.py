@@ -12,7 +12,7 @@ import mlx.nn as nn
 from mlx.optimizers import SGD
 from mlx.utils import tree_flatten
 
-from mlx_private import make_private_loss, DPOptimizer, clip_and_aggregate
+from private_mlx import make_private_loss, DPOptimizer, clip_and_aggregate
 
 
 class TinyMLP(nn.Module):

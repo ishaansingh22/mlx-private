@@ -3,7 +3,7 @@
 Per-sample differentially private SGD (DP-SGD) for LoRA fine-tuning on Apple Silicon. All training runs on-device via MLX.
 
 ```python
-from mlx_private import make_private_loss, DPOptimizer
+from private_mlx import make_private_loss, DPOptimizer
 
 dp_loss_fn = make_private_loss(model, loss_fn)
 optimizer = DPOptimizer(base_optimizer, l2_norm_clip=1.0, noise_multiplier=1.1,
@@ -146,7 +146,7 @@ The RDP accountant assumes Poisson subsampling (each example included independen
 ```python
 from mlx_lm import load
 from mlx_lm.tuner.utils import linear_to_lora_layers
-from mlx_private import make_private_loss, DPOptimizer
+from private_mlx import make_private_loss, DPOptimizer
 import mlx.nn as nn
 from mlx.optimizers import Adam
 

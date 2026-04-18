@@ -6,7 +6,7 @@ import importlib
 import mlx.core as mx
 import mlx.nn as nn
 
-from mlx_private import ensure_attention_backend_for_per_sample_grads
+from private_mlx import ensure_attention_backend_for_per_sample_grads
 
 
 class _FakeAttention:
@@ -28,7 +28,7 @@ class _FakeModel:
 
 
 def _install_fake_module():
-    from mlx_private import _patch as patch_mod
+    from private_mlx import _patch as patch_mod
 
     mod_name = "tests._fake_attention_mod"
     if mod_name in importlib.sys.modules:

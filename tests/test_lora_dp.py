@@ -12,7 +12,7 @@ import numpy as np
 from mlx.utils import tree_flatten
 from mlx.optimizers import Adam
 
-from mlx_private import make_private_loss, DPOptimizer, patch_model_for_dp
+from private_mlx import make_private_loss, DPOptimizer, patch_model_for_dp
 
 pytestmark = pytest.mark.lora
 

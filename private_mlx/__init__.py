@@ -1,4 +1,4 @@
-"""mlx-private: Privacy-preserving training primitives for Apple MLX."""
+"""private-mlx: Privacy-preserving training primitives for Apple MLX."""
 
 from .grad import make_private_loss
 from .clip import per_sample_global_norm, clip_and_aggregate, clip_and_aggregate_microbatched

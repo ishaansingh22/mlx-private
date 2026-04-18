@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mlx-private"
+name = "private-mlx"
 version = "0.1.0"
 description = "MLX-native DP-SGD for private LoRA fine-tuning on Apple Silicon"
 readme = "README.md"
@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/IshaanSingh22/mlx-private"
+Repository = "https://github.com/ishaansingh22/private-mlx"
 
 [project.optional-dependencies]
 test = [
@@ -27,11 +27,11 @@ lora = [
     "numpy",
 ]
 dev = [
-    "mlx-private[test,lora]",
+    "private-mlx[test,lora]",
 ]
 
 [tool.setuptools.packages.find]
-include = ["mlx_private*"]
+include = ["private_mlx*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

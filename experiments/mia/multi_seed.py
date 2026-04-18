@@ -140,7 +140,7 @@ def run_canary_ablation(base_dir: str):
             f.write(json.dumps(item) + "\n")
 
     from attack import load_model_with_adapter, tokenize_corpus, score_losses
-    from mlx_private._patch import ensure_attention_backend_for_per_sample_grads
+    from private_mlx._patch import ensure_attention_backend_for_per_sample_grads
 
     run_dir = os.path.join(base_dir, "runs", "non_dp")
     with open(os.path.join(run_dir, "meta.json")) as f:

@@ -17,7 +17,7 @@ import mlx.core as mx
 import mlx.nn as nn
 import numpy as np
 
-from mlx_private._patch import ensure_attention_backend_for_per_sample_grads
+from private_mlx._patch import ensure_attention_backend_for_per_sample_grads
 
 
 def load_model_with_adapter(meta: dict, adapter_path: str):
